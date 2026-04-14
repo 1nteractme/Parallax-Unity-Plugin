@@ -1,0 +1,19 @@
+{
+  "name": "com.1nteractme.parallax",
+  "displayName": "Parallax",
+  "version": "1.0.0",
+  "unity": "6000.0",
+  "description": "Parallax controllers for world and UI layers, with sprite-set backgrounds and seamless tiling.",
+  "keywords": [
+    "parallax",
+    "background",
+    "ui",
+    "2d"
+  ],
+  "author": {
+    "name": "1nteractme"
+  },
+  "dependencies": {
+    "com.unity.ugui": "2.0.0"
+  }
+}
