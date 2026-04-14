@@ -48,6 +48,7 @@ namespace Interactme.Parallax
 
         private readonly List<LayerTileState> _tileStates = new();
         private readonly List<Vector2Int> _requiredOffsets = new();
+        private readonly Vector3[] _worldCornersBuffer = new Vector3[4];
         private int _currentSetIndex = -1;
 
         public int CurrentSetIndex => _currentSetIndex;
@@ -226,7 +227,7 @@ namespace Interactme.Parallax
             BuildRequiredOffsets(_requiredOffsets);
             EnsureTileEntries(state, _requiredOffsets);
 
-            var size = state.SourceRect.rect.size;
+            GetTileStepVectors(state.SourceRect, out var stepX, out var stepY);
             for (var i = 0; i < state.Tiles.Count; i++)
             {
                 var tile = state.Tiles[i];
@@ -235,16 +236,10 @@ namespace Interactme.Parallax
                     continue;
                 }
 
-                tile.Rect.anchorMin = state.SourceRect.anchorMin;
-                tile.Rect.anchorMax = state.SourceRect.anchorMax;
-                tile.Rect.pivot = state.SourceRect.pivot;
-                tile.Rect.sizeDelta = state.SourceRect.sizeDelta;
-                tile.Rect.localScale = Vector3.one;
-                tile.Rect.localRotation = Quaternion.identity;
-                tile.Rect.anchoredPosition = new Vector2(
-                    size.x * tile.Offset.x,
-                    size.y * tile.Offset.y);
-
+                CopyRectLayout(state.SourceRect, tile.Rect);
+                tile.Rect.position = state.SourceRect.position
+                    + (stepX * tile.Offset.x)
+                    + (stepY * tile.Offset.y);
                 CopyImageVisuals(state.Source, tile.Image);
             }
         }
@@ -284,8 +279,9 @@ namespace Interactme.Parallax
                 typeof(Image));
 
             var cloneRect = clone.GetComponent<RectTransform>();
-            cloneRect.SetParent(sourceRect, false);
-            cloneRect.SetAsFirstSibling();
+            var tileParent = sourceRect.parent != null ? sourceRect.parent : sourceRect;
+            cloneRect.SetParent(tileParent, false);
+            cloneRect.SetSiblingIndex(sourceRect.GetSiblingIndex());
 
             var cloneImage = clone.GetComponent<Image>();
             cloneImage.raycastTarget = false;
@@ -432,6 +428,23 @@ namespace Interactme.Parallax
             target.fillOrigin = source.fillOrigin;
             target.enabled = source.enabled && source.sprite != null;
             target.raycastTarget = false;
+        }
+
+        private void GetTileStepVectors(RectTransform sourceRect, out Vector3 stepX, out Vector3 stepY)
+        {
+            sourceRect.GetWorldCorners(_worldCornersBuffer);
+            stepX = _worldCornersBuffer[3] - _worldCornersBuffer[0];
+            stepY = _worldCornersBuffer[1] - _worldCornersBuffer[0];
+        }
+
+        private static void CopyRectLayout(RectTransform source, RectTransform target)
+        {
+            target.anchorMin = source.anchorMin;
+            target.anchorMax = source.anchorMax;
+            target.pivot = source.pivot;
+            target.sizeDelta = source.sizeDelta;
+            target.localScale = source.localScale;
+            target.localRotation = source.localRotation;
         }
 
         [Serializable]
