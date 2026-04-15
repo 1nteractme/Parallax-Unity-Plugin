@@ -73,11 +73,9 @@ namespace Interactme.Parallax
 
                 if (_useAnchoredPosition && _rectTransform != null)
                 {
-                    var rect = _rectTransform.rect;
-                    var scale = _rectTransform.localScale;
-
-                    var sizeX = Mathf.Abs(rect.width * scale.x);
-                    var sizeY = Mathf.Abs(rect.height * scale.y);
+                    var cycleSize = GetRectTransformCycleSize(_rectTransform);
+                    var sizeX = cycleSize.x;
+                    var sizeY = cycleSize.y;
 
                     if (sizeX > 0.01f)
                     {
@@ -150,6 +148,24 @@ namespace Interactme.Parallax
 
                 var half = period * 0.5f;
                 return Mathf.Repeat(value + half, period) - half;
+            }
+
+            private static Vector2 GetRectTransformCycleSize(RectTransform rectTransform)
+            {
+                var worldCorners = new Vector3[4];
+                rectTransform.GetWorldCorners(worldCorners);
+
+                var horizontalStep = worldCorners[3] - worldCorners[0];
+                var verticalStep = worldCorners[1] - worldCorners[0];
+                var parent = rectTransform.parent;
+
+                if (parent != null)
+                {
+                    horizontalStep = parent.InverseTransformVector(horizontalStep);
+                    verticalStep = parent.InverseTransformVector(verticalStep);
+                }
+
+                return new Vector2(horizontalStep.magnitude, verticalStep.magnitude);
             }
 
             private bool ResolveUseAnchoredPosition()
