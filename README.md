@@ -1,6 +1,11 @@
 # 1nteractme Parallax Plugin
 
-Embedded UPM plugin for Unity UI and 2D background layers.
+<div align="left">
+    <a href="https://1nteractme.itch.io/parallax"><img align="center" src="https://img.shields.io/badge/Play_Demo-100000?&logoColor=white&color=red&style=for-the-badge" alt="Play Demo"/></a>
+    <img align="center" src="https://komarev.com/ghpvc/?username=1nteractme-Parallax-Unity-Plugin&color=7f52ff&style=for-the-badge&abbreviated=true&label=PROJECT+VIEWS" alt="Project Views"/>
+</div>
+
+#### Embedded UPM plugin for Unity UI and 2D background layers.
 
 ## Included Components
 
