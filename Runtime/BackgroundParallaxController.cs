@@ -18,6 +18,13 @@ namespace Interactme.Parallax
             AnchoredUI = 2
         }
 
+        public enum CycleAxisMode
+        {
+            X = 0,
+            Y = 1,
+            Both = 2
+        }
+
         [Serializable]
         public sealed class ParallaxLayer
         {
@@ -28,11 +35,7 @@ namespace Interactme.Parallax
 
             [Header("Infinite Cycle")]
             [SerializeField] private bool _infiniteCycle = true;
-            [SerializeField] private bool _cycleX = true;
-            [SerializeField] private bool _cycleY;
-            [SerializeField, Min(0.01f)] private float _cycleSizeX = 20f;
-            [SerializeField, Min(0.01f)] private float _cycleSizeY = 10f;
-            [SerializeField] private bool _autoCycleSizeFromSprite = true;
+            [SerializeField] private CycleAxisMode _cycleAxis = CycleAxisMode.X;
 
             [NonSerialized] private Vector3 _startWorldPosition;
             [NonSerialized] private Vector2 _startAnchoredPosition;
@@ -46,10 +49,7 @@ namespace Interactme.Parallax
             public Transform Target => _target;
             public float SpeedMultiplier => _speedMultiplier;
             public bool InfiniteCycle => _infiniteCycle;
-            public bool CycleX => _cycleX;
-            public bool CycleY => _cycleY;
-            public float CycleSizeX => _runtimeCycleSizeX > 0f ? _runtimeCycleSizeX : _cycleSizeX;
-            public float CycleSizeY => _runtimeCycleSizeY > 0f ? _runtimeCycleSizeY : _cycleSizeY;
+            public CycleAxisMode CycleAxis => _cycleAxis;
 
             public void CaptureStartState()
             {
@@ -65,11 +65,6 @@ namespace Interactme.Parallax
                 _runtimeOffset = Vector2.zero;
                 _runtimeCycleSizeX = 0f;
                 _runtimeCycleSizeY = 0f;
-
-                if (!_autoCycleSizeFromSprite)
-                {
-                    return;
-                }
 
                 if (_useAnchoredPosition && _rectTransform != null)
                 {
@@ -118,14 +113,14 @@ namespace Interactme.Parallax
 
                 if (_infiniteCycle)
                 {
-                    if (_cycleX)
+                    if (UsesHorizontalCycle())
                     {
-                        _runtimeOffset.x = WrapSigned(_runtimeOffset.x, CycleSizeX);
+                        _runtimeOffset.x = WrapSigned(_runtimeOffset.x, _runtimeCycleSizeX);
                     }
 
-                    if (_cycleY)
+                    if (UsesVerticalCycle())
                     {
-                        _runtimeOffset.y = WrapSigned(_runtimeOffset.y, CycleSizeY);
+                        _runtimeOffset.y = WrapSigned(_runtimeOffset.y, _runtimeCycleSizeY);
                     }
                 }
 
@@ -166,6 +161,16 @@ namespace Interactme.Parallax
                 }
 
                 return new Vector2(horizontalStep.magnitude, verticalStep.magnitude);
+            }
+
+            private bool UsesHorizontalCycle()
+            {
+                return _cycleAxis == CycleAxisMode.X || _cycleAxis == CycleAxisMode.Both;
+            }
+
+            private bool UsesVerticalCycle()
+            {
+                return _cycleAxis == CycleAxisMode.Y || _cycleAxis == CycleAxisMode.Both;
             }
 
             private bool ResolveUseAnchoredPosition()

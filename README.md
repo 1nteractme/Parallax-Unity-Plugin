@@ -12,7 +12,7 @@ Embedded UPM plugin for Unity UI and 2D background layers.
 
 - Layer-based parallax with per-layer speed.
 - Auto-scroll mode (works even when camera is static).
-- Infinite cycle support on X/Y.
+- Infinite cycle support on X, Y, or both axes.
 - UI mode support (`RectTransform` + `Image`).
 - Background sprite sets with random/manual selection.
 - Seamless tiling for `Image` layers.
